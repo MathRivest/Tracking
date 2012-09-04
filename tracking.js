@@ -1,6 +1,7 @@
 
    /*
-    * Version 0.2
+    * Version 0.3
+    * Now on Gitub
     * To make your life easier when you receive this 75 lines tracking document
     * 
     * 1. Include GA tracking code

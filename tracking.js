@@ -1,6 +1,5 @@
-
    /*
-    * Version 0.3
+    * Version 0.4
     * Now on Gitub
     * To make your life easier when you receive this 75 lines tracking document
     * 
@@ -10,12 +9,12 @@
     *
     * Reading:
     * Google Analytics: 
-    * https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide
-    * https://developers.google.com/analytics/devguides/collection/gajs/gaTrackingSocial
+    * - https://developers.google.com/analytics/devguides/collection/gajs/eventTrackerGuide
+    * - https://developers.google.com/analytics/devguides/collection/gajs/gaTrackingSocial
     * Facebook: 
-    * https://developers.facebook.com/docs/reference/javascript/FB.Event.subscribe/
+    * - https://developers.facebook.com/docs/reference/javascript/FB.Event.subscribe/
     * Twitter: 
-    * https://dev.twitter.com/docs/intents/events
+    * - https://dev.twitter.com/docs/intents/events
     *
     */
 
@@ -23,18 +22,20 @@ var TRKNG = TRKNG || {};
 
 
 TRKNG.init = function(){
+
+    //console.log('TRKNG.init');
     TRKNG.buttons();
 }
 
 TRKNG.buttons = function(){
 
    /* Usage:
-    * <a href="url" data-trkng data-trkng-cat="my category" data-trkng-act="my action" data-trkng-lbl="my label">Tracked link</a>
-    * data-trkng is the main attribute for this function to work since its used in the selector to bind the behaviors
-    * can be inbound or if left empty it will be a normal event (like downloading a pdf, opening a modal box, etc)
+    * - <a href="url" data-trkng data-trkng-cat="my category" data-trkng-act="my action" data-trkng-lbl="my label">Tracked link</a>
+    * - data-trkng is the main attribute for this function to work since its used in the selector to bind the behaviors
+    * - can be inbound or if left empty it will be a normal event (like downloading a pdf, opening a modal box, etc)
     */
 
-    $("[data-trkng]").click(function(){
+    $(document).on('click', '[data-trkng]', function(){
         var type = $(this).data("trkng"),
         category = $(this).data("trkng-cat"),
           action = $(this).data("trkng-act"),
@@ -53,36 +54,72 @@ TRKNG.buttons = function(){
     });
 }
 
-TRKNG.facebook = function(){
-
-   /* Requirements:
-    * - Loading the facebook Javascript SDK asynchronously
-    * Usage:
-    * call TRKNG.facebook(); in the fbAsyncInit function
+TRKNG.event = function(category, action, opt_label, opt_value, opt_noninteraction){ 
+   /* Usage:
+    * call TRKNG.event(params); on any event
     */
 
-    //When a user like
-    FB.Event.subscribe('edge.create', function(href, widget){
-        _gaq.push(['_trackSocial', 'Facebook', 'Like', href]);
-    });
-
-    //When a user unlike
-    FB.Event.subscribe('edge.remove', function(targetUrl) {
-      _gaq.push(['_trackSocial', 'facebook', 'Unlike', targetUrl]);
-    });
+    _gaq.push(['_trackEvent', category, action, opt_label, opt_value, opt_noninteraction]);
 }
 
-TRKNG.twitter = function(){
+TRKNG.facebook = {
+    
+    /*
+    * Requirements:
+    * - Loading the facebook Javascript SDK asynchronously
+    */
+
+    event : function(opt_label, opt_value, opt_noninteraction){
+
+        /*
+        * What it does:
+        * - sends Facebook tracking events in a normal event, so that it can be compiled with the rest of the analytics 
+        * Usage:
+        * - call TRKNG.facebook.event(); in the fbAsyncInit function
+        */
+
+        //When a user like
+        FB.Event.subscribe('edge.create', function(href, widget){
+            _gaq.push(['_trackEvent', 'Facebook', 'Like', opt_label, opt_value, opt_noninteraction]);
+        });
+
+        //When a user unlike
+        FB.Event.subscribe('edge.remove', function(targetUrl) {
+            _gaq.push(['_trackEvent', 'facebook', 'Unlike', opt_label, opt_value, opt_noninteraction]);
+        });
+    },
+    social : function(opt_pagePath){
+
+       /* Requirements:
+        * What it does:
+        * - sends Facebook tracking events in a normal event, so that it can be compiled with the rest of the analytics
+        * Usage:
+        * - call TRKNG.facebook.social(); in the fbAsyncInit function
+        */
+
+        //When a user like
+        FB.Event.subscribe('edge.create', function(href, widget){
+            _gaq.push(['_trackSocial', 'Facebook', 'Like', href, opt_pagePath]);
+        });
+
+        //When a user unlike
+        FB.Event.subscribe('edge.remove', function(targetUrl) {
+          _gaq.push(['_trackSocial', 'facebook', 'Unlike', targetUrl, opt_pagePath]);
+        });
+    }
+}
+
+TRKNG.twitter = function(opt_target, opt_pagePath){
 
    /* Requirements:
     * - Twitter widjet.js
     * Usage:
-    * call TRKNG.twitter(); after widget.js was loaded
+    * - call TRKNG.twitter(); after widget.js was loaded
     */
 
     twttr.ready(function(twttr) {
-        twttr.events.bind('tweet', function(event) { //the tweet event 
-            _gaq.push(['_trackSocial', 'twitter', 'tweet']);
+        twttr.events.bind('tweet', function(event) { //the tweet event
+            _gaq.push(['_trackSocial', 'twitter', 'tweet', opt_target, opt_pagePath]);
         });
     });
 }

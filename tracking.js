@@ -91,3 +91,17 @@ TRKNG.recordInboundLink = function(link, category, action, label) {
     _gat._getTrackerByName()._trackEvent(category, action, label);
     setTimeout('document.location = "' + link + '"', 100);
 }
+
+
+
+
+
+// Track page load time in Google Analytics
+// _gaq.push(['_trackPageLoadTime']);
+
+// Add a Javascript error handler so that it creates an event in Google Analytics
+// whenever there's a CLIENT-SIDE javascript error
+// window.onerror = function(message, file, line) { 
+//     var sFormattedMessage = '[' + file + ' (' + line + ')] ' + message; 
+//     _gaq.push(['_trackEvent', 'Errors', 'Browser', sFormattedMessage, null, true]);
+// }
